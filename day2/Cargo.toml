@@ -1,0 +1,7 @@
+[package]
+name = "day2"
+version = "0.1.0"
+authors = ["Victor Sonck <victor.sonck@ml6.eu>"]
+edition = "2018"
+
+[dependencies]
