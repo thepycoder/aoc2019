@@ -1,0 +1,23 @@
+[[package]]
+name = "bimap"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "cfg-if 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "cfg-if"
+version = "0.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "day5"
+version = "0.1.0"
+dependencies = [
+ "bimap 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[metadata]
+"checksum bimap 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "446177e5c72eca392a27926194ceb51a6d3f6a855ef56a490fca096e93f9971f"
+"checksum cfg-if 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)" = "4785bdd1c96b2a846b2bd7cc02e86b6b3dbf14e7e53446c4f54c92a361040822"
