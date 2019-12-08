@@ -87,7 +87,6 @@ fn part2(input: String, size: usize) {
     // println!("Layers: {}", layers);
     // println!("LayerList: {:?}", layerlist);
 
-    // Create a new ImgBuf with width: imgx and height: imgy
     let mut imgbuf = image::ImageBuffer::new(25, 6);
 
     layerlist.reverse();
@@ -107,7 +106,6 @@ fn part2(input: String, size: usize) {
         }
     }
 
-    // Save the image as “fractal.png”, the format is deduced from the path
     imgbuf.save("image/answer.png").unwrap();
 
 }
