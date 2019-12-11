@@ -1,8 +1,9 @@
-#[macro_use]
-extern crate text_io;
+use itertools::Itertools;
 use std::*;
+use std::iter::once;
+use permutohedron::heap_recursive;
 
-// 223 too low
+// 55270102 too high
 
 enum Op {
     Add,
@@ -19,7 +20,7 @@ enum OpCode {
     Halt,
 }
 
-fn parse_opcode(opcode: i32) -> (OpCode, Vec<usize>) {
+fn parse_opcode(opcode: i64) -> (OpCode, Vec<usize>) {
     let opstring = opcode.to_string();
     let mut opvec: Vec<usize> = opstring
         .split("")
@@ -36,7 +37,7 @@ fn parse_opcode(opcode: i32) -> (OpCode, Vec<usize>) {
     let real_opcode = opvec[3] * 10 + opvec[4];
     let mut param_modes = vec![opvec[0], opvec[1], opvec[2]];
     // println!("Opvec: {:?}", opvec);
-    println!("Opcode: {:?}", real_opcode);
+    // println!("Opcode: {:?}", real_opcode);
     // println!("Parameter modes: {:?}", param_modes);
     let return_op: OpCode;
     match real_opcode {
@@ -74,15 +75,16 @@ fn parse_opcode(opcode: i32) -> (OpCode, Vec<usize>) {
     (return_op, param_modes)
 }
 
-fn run_program(state: &mut Vec<i32>) -> &mut Vec<i32> {
+fn run_program(state: &mut Vec<i64>, invec: &mut Vec<i64>, mut power_level: i64) -> i64 {
     let mut pointer: usize = 0;
+    let mut phase_setting: bool = true;
+
     loop {
         // println!("{:?}", state);
-        let mut current_pointer_val = state[pointer];
         let (opcode, param_modes) = parse_opcode(state[pointer]);
         match opcode {
             OpCode::Arith(op) => {
-                println!("Pointer: {}", pointer);
+                // println!("Pointer: {}", pointer);
 
                 let x: usize;
                 let y: usize;
@@ -104,10 +106,10 @@ fn run_program(state: &mut Vec<i32>) -> &mut Vec<i32> {
                     _ => target = 0,
                 }
 
-                let mut jump;
-                println!("x: {}", x);
-                println!("y: {}", y);
-                println!("target: {}", target);
+                let jump;
+                // println!("x: {}", x);
+                // println!("y: {}", y);
+                // println!("target: {}", target);
 
                 match op {
                     Op::Add => {
@@ -121,14 +123,24 @@ fn run_program(state: &mut Vec<i32>) -> &mut Vec<i32> {
                         jump = 4;
                     }
                     Op::In => {
-                        println!("ID: ");
-                        let input: i32 = read!();
-                        // println!("[IN] {}", input);
+                        let input: i64;
+                        // println!("[invec]: {:?}", invec);
+                        if phase_setting {
+                            phase_setting = false;
+                            input = invec.pop().unwrap();
+                            // println!("POP!");
+                        } else {
+                            input = power_level;
+                            phase_setting = true;
+                        }
+                        // println!("[IN]: {}", input);
+                        // println!("[invec]: {:?}", invec);
                         state[x] = input;
                         jump = 2;
                     }
                     Op::Out => {
-                        println!("[OUT] {}", state[x]);
+                        // println!("[OUT] {}", state[x]);
+                        power_level = state[x];
                         jump = 2;
                     }
                     Op::JumpIfTrue => {
@@ -168,25 +180,61 @@ fn run_program(state: &mut Vec<i32>) -> &mut Vec<i32> {
                 //     jump = 0;
                 // }
                 pointer += jump;
-                println!("\n",);
+                // println!("\n",);
             }
-            OpCode::Halt => return state,
+            OpCode::Halt => return power_level,
         }
     }
 }
 
 fn main() {
-    // let raw: String = "3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99".to_string();
-    let filename = "src/input2.txt";
+    // let raw: String = "3,31,3,32,1002,32,10,32,1001,31,-2,31,1007,31,0,33,1002,33,7,33,1,33,31,31,1,32,31,31,4,31,99,0,0,0".to_string();
+    let filename = "src/input.txt";
 
     let raw = fs::read_to_string(filename).expect("Something went wrong reading the file");
-    let mut input: Vec<i32> = raw
+    let mut input: Vec<i64> = raw
         .trim()
         .split(",")
-        .map(|x| x.parse::<i32>().unwrap())
+        .map(|x| x.parse::<i64>().unwrap())
         .collect();
     // println!("{:?}", input);
 
-    let test = run_program(&mut input);
-    // println!("{:?}", test);
+    let mut power_level = 0;
+    // let mut invec = vec![1,0,4,3,2];
+
+    let range = || (0..=4);
+
+    let all: Vec<Vec<i64>> = once(range())
+        .chain(once(range()))
+        .chain(once(range()))
+        .chain(once(range()))
+        .chain(once(range()))
+        .multi_cartesian_product()
+        .collect();
+    
+    // println!("{:?}", all);
+
+    let mut data = [0, 1, 2, 3, 4];
+    let mut permutations = Vec::new();
+    heap_recursive(&mut data, |permutation| {
+        permutations.push(permutation.to_vec())
+    });
+
+    let mut max = 0;
+    for mut invec in permutations {
+        let cp = invec.clone();
+        invec.reverse();
+        power_level = 0;
+        for _i in 0..5 {
+            power_level = run_program(&mut input, &mut invec, power_level);
+        }
+        if power_level > max {
+            max = power_level;
+        }
+        if cp == vec![1,0,4,3,2] {
+            println!("{:?}", cp);
+            println!("{:?}\n", power_level);
+        }
+    }
+    println!("{:?}", max);
 }
