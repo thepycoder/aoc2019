@@ -1,0 +1,10 @@
+[package]
+name = "day12"
+version = "0.1.0"
+authors = ["Victor Sonck <victor.sonck@ml6.eu>"]
+edition = "2018"
+
+[dependencies]
+regex = "1"
+permutohedron = "0.2.4"
+itertools = "0.8.2"

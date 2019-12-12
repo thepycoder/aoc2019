@@ -211,7 +211,7 @@ fn main() {
         .chain(once(range()))
         .multi_cartesian_product()
         .collect();
-    
+
     // println!("{:?}", all);
 
     let mut data = [0, 1, 2, 3, 4];
@@ -225,7 +225,7 @@ fn main() {
         let cp = invec.clone();
         invec.reverse();
         power_level = 0;
-        for _i in 0..5 {
+        for _amp in 0..5 {
             power_level = run_program(&mut input, &mut invec, power_level);
         }
         if power_level > max {
